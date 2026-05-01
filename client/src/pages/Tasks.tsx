@@ -29,6 +29,12 @@ const Tasks: React.FC = () => {
     fetch();
   }, [statusFilter, priorityFilter]);
 
+  const handleStatusChange = async (taskId: string, status: 'todo' | 'in_progress' | 'review' | 'done') => {
+    if (user?.role !== 'admin') return;
+    await taskService.updateTask(taskId, { status });
+    await fetch();
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Tasks</h2>
@@ -67,7 +73,7 @@ const Tasks: React.FC = () => {
       ) : (
         <div className="grid gap-3">
           {tasks.map((t) => (
-            <TaskCard key={t.id} task={t} />
+            <TaskCard key={t.id} task={t} isAdmin={user?.role === 'admin'} onStatusChange={handleStatusChange} />
           ))}
         </div>
       )}

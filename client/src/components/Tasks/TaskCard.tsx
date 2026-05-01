@@ -3,7 +3,9 @@ import { format } from 'date-fns';
 
 type Props = {
   task: any;
+  isAdmin?: boolean;
   onClick?: (task: any) => void;
+  onStatusChange?: (taskId: string, status: 'todo' | 'in_progress' | 'review' | 'done') => void;
 };
 
 const priorityClasses: Record<string, string> = {
@@ -20,7 +22,14 @@ const statusBadge: Record<string, string> = {
   done: 'bg-green-100 text-green-700 font-medium',
 };
 
-const TaskCard: React.FC<Props> = ({ task, onClick }) => {
+const statusOptions: Array<{ value: 'todo' | 'in_progress' | 'review' | 'done'; label: string }> = [
+  { value: 'todo', label: 'Todo' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'review', label: 'Review' },
+  { value: 'done', label: 'Done' },
+];
+
+const TaskCard: React.FC<Props> = ({ task, isAdmin = false, onClick, onStatusChange }) => {
   return (
     <div onClick={() => onClick && onClick(task)} className={`card p-3 cursor-pointer hover:shadow-md transition border border-purple-200/20 ${priorityClasses[task.priority] || ''}`}>
       <div className="flex justify-between items-start gap-2">
@@ -34,6 +43,23 @@ const TaskCard: React.FC<Props> = ({ task, onClick }) => {
           {task.dueDate && <div className="text-xs text-purple-400 mt-1">Due {format(new Date(task.dueDate), 'MMM d')}</div>}
         </div>
       </div>
+
+      {isAdmin && onStatusChange && (
+        <div className="mt-3 pt-3 border-t border-purple-100" onClick={(e) => e.stopPropagation()}>
+          <label className="block text-xs font-semibold text-purple-700 mb-1">Update status</label>
+          <select
+            value={task.status}
+            onChange={(e) => onStatusChange(task.id, e.target.value as 'todo' | 'in_progress' | 'review' | 'done')}
+            className="w-full rounded-lg border border-purple-200 bg-white px-3 py-2 text-sm text-slate-700"
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 };

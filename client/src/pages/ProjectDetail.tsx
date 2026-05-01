@@ -42,11 +42,24 @@ const ProjectDetail: React.FC = () => {
   if (loading) return <div>Loading...</div>;
   if (!project) return <div>Project not found</div>;
 
-  const columns = ['todo', 'in_progress', 'review', 'done'];
+  const columns = [
+    { key: 'todo', title: 'Todo', subtitle: 'Queued for work', accent: 'from-slate-500 to-slate-700' },
+    { key: 'in_progress', title: 'In Progress', subtitle: 'Actively moving', accent: 'from-blue-500 to-cyan-500' },
+    { key: 'review', title: 'Review', subtitle: 'Under approval', accent: 'from-purple-500 to-fuchsia-500' },
+    { key: 'done', title: 'Done', subtitle: 'Completed and delivered', accent: 'from-emerald-500 to-teal-500' },
+  ] as const;
   const tasksByStatus = columns.reduce((acc, status) => {
-    acc[status] = tasks.filter((t) => t.status === status);
+    acc[status.key] = tasks.filter((t) => t.status === status.key);
     return acc;
   }, {} as Record<string, any[]>);
+
+  const isAdmin = user?.role === 'admin';
+
+  const handleStatusChange = async (taskId: string, status: 'todo' | 'in_progress' | 'review' | 'done') => {
+    if (!isAdmin) return;
+    await taskService.updateTask(taskId, { status });
+    await fetch();
+  };
 
   return (
     <div>
@@ -58,6 +71,59 @@ const ProjectDetail: React.FC = () => {
         {user?.role === 'admin' && (
           <Button onClick={() => setShowEditModal(true)}>Edit</Button>
         )}
+      </div>
+
+      <div className="mb-8 rounded-3xl border border-purple-200/50 bg-white/70 p-5 shadow-sm backdrop-blur">
+        <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-purple-500">Project flow</p>
+            <h3 className="text-xl font-bold text-blue-900">Work is tracked as a live status stream</h3>
+          </div>
+          <div className="text-sm text-slate-600">
+            {tasks.length} task{tasks.length === 1 ? '' : 's'} total
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-6 right-6 top-6 h-1 rounded-full bg-gradient-to-r from-slate-200 via-blue-200 via-purple-200 to-emerald-200" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4 relative z-10">
+            {columns.map((column, index) => {
+              const count = tasksByStatus[column.key].length;
+              const active = count > 0;
+              return (
+                <div key={column.key} className="rounded-2xl border border-purple-100 bg-white/90 p-4 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${column.accent} text-white flex items-center justify-center font-bold shadow-md`}>
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-blue-900">{column.title}</h4>
+                      <p className="text-xs text-slate-500">{column.subtitle}</p>
+                    </div>
+                  </div>
+                  <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${active ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-500'}`}>
+                    {count} {count === 1 ? 'item' : 'items'}
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {tasksByStatus[column.key].map((t) => (
+                      <TaskCard
+                        key={t.id}
+                        task={t}
+                        isAdmin={isAdmin}
+                        onStatusChange={handleStatusChange}
+                      />
+                    ))}
+                    {tasksByStatus[column.key].length === 0 && (
+                      <div className="rounded-xl border border-dashed border-purple-200 bg-purple-50/40 p-4 text-sm text-slate-500">
+                        Nothing here yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Members Section */}
@@ -72,29 +138,18 @@ const ProjectDetail: React.FC = () => {
         </div>
       )}
 
-      {/* Kanban Board */}
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {columns.map((status) => (
-          <div key={status} className="flex-shrink-0 w-80 bg-white rounded-lg p-4 border border-purple-200/30 shadow-sm">
-            <h3 className="font-bold text-blue-900 mb-4 capitalize text-lg">{status.replace('_', ' ')}</h3>
-            <div className="space-y-3 min-h-96">
-              {tasksByStatus[status].map((t) => (
-                <TaskCard key={t.id} task={t} />
-              ))}
-            </div>
-            {user?.role === 'admin' && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setShowTaskModal(true)}
-                className="w-full mt-4 text-purple-600 border-purple-300 hover:bg-purple-50"
-              >
-                + Add Task
-              </Button>
-            )}
-          </div>
-        ))}
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowTaskModal(true)}
+            className="text-purple-600 border-purple-300 hover:bg-purple-50"
+          >
+            + Add Task
+          </Button>
+        </div>
+      )}
 
       <Modal isOpen={showTaskModal} title="New Task" onClose={() => setShowTaskModal(false)}>
         <TaskForm

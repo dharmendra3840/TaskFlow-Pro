@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const roleCheck_1 = require("../middleware/roleCheck");
+const dashboardController_1 = require("../controllers/dashboardController");
+const router = (0, express_1.Router)();
+router.get('/admin', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), dashboardController_1.adminStats);
+router.get('/member', auth_1.authMiddleware, dashboardController_1.memberStats);
+exports.default = router;

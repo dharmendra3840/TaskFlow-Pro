@@ -9,7 +9,7 @@ const router = Router();
 
 router.get('/', authMiddleware, listTasks);
 router.post('/', authMiddleware, roleCheck('admin'), taskValidator, handleValidation, createTask);
-router.put('/:id', authMiddleware, updateTask);
+router.put('/:id', authMiddleware, roleCheck('admin'), updateTask);
 router.delete('/:id', authMiddleware, roleCheck('admin'), deleteTask);
 
 export default router;

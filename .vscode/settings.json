@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"c:\\\\Users\\\\Asus\\\\Desktop\\\\Projects\\\\TaskFlow pro\\\\server\"; node -e \"\\(async\\(\\)=>\\{ for \\(const \\[email,password\\] of \\[\\['member1@test\\.com','TaskFlow123!'\\],\\['admin@test\\.com','TaskFlow123!'\\]\\]\\) \\{ const res = await fetch\\('http://localhost:5000/api/auth/login',\\{method:'POST',headers:\\{'Content-Type':'application/json'\\},body:JSON\\.stringify\\(\\{email,password\\}\\)\\}\\); const text = await res\\.text\\(\\); console\\.log\\(email, res\\.status, text\\); \\} \\}\\)\\(\\)\\.catch\\(e=>\\{ console\\.error\\(e\\); process\\.exit\\(1\\); \\}\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

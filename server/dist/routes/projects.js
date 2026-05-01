@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const roleCheck_1 = require("../middleware/roleCheck");
+const projectController_1 = require("../controllers/projectController");
+const projectValidator_1 = __importDefault(require("../validators/projectValidator"));
+const handleValidation_1 = __importDefault(require("../middleware/handleValidation"));
+const router = (0, express_1.Router)();
+router.get('/', auth_1.authMiddleware, projectController_1.listProjects);
+router.post('/', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), projectValidator_1.default, handleValidation_1.default, projectController_1.createProject);
+router.get('/:id', auth_1.authMiddleware, projectController_1.getProject);
+router.put('/:id', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), projectValidator_1.default, handleValidation_1.default, projectController_1.updateProject);
+router.delete('/:id', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), projectController_1.deleteProject);
+router.post('/:id/members', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), projectController_1.addMember);
+router.delete('/:id/members/:userId', auth_1.authMiddleware, (0, roleCheck_1.roleCheck)('admin'), projectController_1.removeMember);
+exports.default = router;

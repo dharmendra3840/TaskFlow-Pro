@@ -1,9 +1,16 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <aside className="w-64 p-4" style={{ background: 'linear-gradient(180deg, #0F1A3F 0%, #1A0F3F 100%)', minHeight: '100vh' }}>
       <div className="text-white font-bold text-xl mb-6">TaskFlow Pro</div>
@@ -22,7 +29,7 @@ const Sidebar: React.FC = () => {
             </div>
           </div>
         )}
-        <button onClick={logout} className="mt-3 text-sm text-purple-300 hover:text-pink-300 transition">Logout</button>
+        <button onClick={handleLogout} className="mt-3 text-sm text-purple-300 hover:text-pink-300 transition">Logout</button>
       </div>
     </aside>
   );

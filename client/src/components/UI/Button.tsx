@@ -13,8 +13,8 @@ const sizeClasses: Record<string, string> = {
 };
 
 const variantClasses: Record<string, string> = {
-  primary: 'bg-primary text-white hover:bg-indigo-700',
-  secondary: 'bg-gray-200 text-slate-800 hover:bg-gray-300',
+  primary: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md hover:shadow-lg hover:scale-[1.01]',
+  secondary: 'bg-white text-purple-700 border border-purple-200 hover:bg-purple-50',
   danger: 'bg-red-500 text-white hover:bg-red-600',
 };
 
@@ -28,7 +28,7 @@ const Button: React.FC<Props> = ({
 }) => {
   return (
     <button
-      className={`rounded font-medium transition ${sizeClasses[size]} ${variantClasses[variant]} disabled:opacity-50`}
+      className={`rounded-lg font-semibold transition duration-200 ${sizeClasses[size]} ${variantClasses[variant]} disabled:opacity-50 disabled:shadow-none`}
       disabled={disabled || loading}
       {...props}
     >
